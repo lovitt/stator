@@ -11,7 +11,7 @@ describe Stator::Model do
   it "should see the initial setting of the state as a change with the initial state as the previous value" do
     u = User.new
     u.state = "activated"
-    u.state_was.should eql("pending")
+    u.state_in_database.should eql("pending")
   end
 
   it "should not obstruct normal validations" do
@@ -33,6 +33,26 @@ describe Stator::Model do
     u.state = "hyperactivated"
 
     u.should be_valid
+  end
+
+  it "should work normally with active record dirty methods before/after save" do
+    u = User.new(email: "doug@example.com")
+
+    u.will_save_change_to_state?.should be_falsey
+    u.state_in_database.should eq("pending")
+    u.state_before_last_save.should be_falsey
+
+    u.state = "hyperactivated"
+
+    u.will_save_change_to_state?.should be true
+    u.state_in_database.should eq("pending")
+    u.state_before_last_save.should be_falsey
+
+    u.save!
+
+    u.will_save_change_to_state?.should be_falsey
+    u.state_in_database.should eq("hyperactivated")
+    u.state_before_last_save.should eq("pending")
   end
 
   it "should ensure a valid state transition when given an illegal state based on the current state" do
