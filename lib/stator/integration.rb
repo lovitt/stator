@@ -25,15 +25,7 @@ module Stator
 
     def state_was(use_previous = false)
       if use_previous
-
-        # TODO: #previous_changes is removed in Rails 5.2 with no replacement.
-        #
-        # This codepath is not run during Stator tests. Need to confirm
-        # it is not run during guideline-app/app tests either.
-        #
-        # Perhaps the use_previous option can be deprecated?
-
-        @record.previous_changes[@machine.field.to_s].try(:[], 0)
+        @record.attribute_before_last_save(@machine.field)
       else
         @record.attribute_in_database(@machine.field)
       end
@@ -49,15 +41,7 @@ module Stator
 
     def state_changed?(use_previous = false)
       if use_previous
-
-        # TODO: #previous_changes is removed in Rails 5.2 with no replacement.
-        #
-        # This codepath is not run during Stator tests. Need to confirm
-        # it is not run during guideline-app/app tests either.
-        #
-        # Perhaps the use_previous option can be deprecated?
-
-        !!@record.previous_changes[@machine.field.to_s]
+        @record.saved_change_to_attribute?(@machine.field)
       else
         @record.will_save_change_to_attribute?(@machine.field)
       end

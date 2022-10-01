@@ -35,10 +35,25 @@ describe Stator::Model do
     u.should be_valid
   end
 
-  it "should work normally with active record dirty methods before/after save" do
+  it "should conditionally fire after_save callbacks when use_previous is true" do
+    u = User.new
+    u.email = "doug@example.com"
+
+    u.semiactivate!
+
+    u.state.should eql("semiactivated")
+    u.activation_notification_published.should_not be true
+
+    u.activate!
+
+    u.state.should eql("activated")
+    u.activation_notification_published.should be true
+  end
+
+  it "should work normally with active_record dirty methods" do
     u = User.new(email: "doug@example.com")
 
-    u.will_save_change_to_state?.should be_falsey
+    u.will_save_change_to_state?.should_not be true
     u.state_in_database.should eq("pending")
     u.state_before_last_save.should be_falsey
 
@@ -50,7 +65,7 @@ describe Stator::Model do
 
     u.save!
 
-    u.will_save_change_to_state?.should be_falsey
+    u.will_save_change_to_state?.should_not be true
     u.state_in_database.should eq("hyperactivated")
     u.state_before_last_save.should eq("pending")
   end
