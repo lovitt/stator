@@ -55,13 +55,13 @@ describe Stator::Model do
 
     u.will_save_change_to_state?.should_not be true
     u.state_in_database.should eq("pending")
-    u.state_before_last_save.should be_falsey
+    u.state_before_last_save.should be nil
 
     u.state = "hyperactivated"
 
     u.will_save_change_to_state?.should be true
     u.state_in_database.should eq("pending")
-    u.state_before_last_save.should be_falsey
+    u.state_before_last_save.should be nil
 
     u.save!
 
