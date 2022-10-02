@@ -95,6 +95,8 @@ class User < ActiveRecord::Base
     self.tagged_at = self.semiactivated_state_at
   end
 
+  private
+
   def publish_activation_notification
     @activation_notification_published = true
   end
