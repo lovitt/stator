@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
 
   before_save :set_tagged_at
 
-  attr_accessor :activation_notification_published
+  attr_reader :activation_notification_published
 
   stator track: true, initial: :pending do
 
@@ -96,7 +96,7 @@ class User < ActiveRecord::Base
   end
 
   def publish_activation_notification
-    self.activation_notification_published = true
+    @activation_notification_published = true
   end
 
 end
