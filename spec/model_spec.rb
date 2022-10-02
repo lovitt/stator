@@ -35,21 +35,6 @@ describe Stator::Model do
     u.should be_valid
   end
 
-  it "should conditionally fire after_save callbacks when use_previous is true" do
-    u = User.new
-    u.email = "doug@example.com"
-
-    u.semiactivate!
-
-    u.state.should eql("semiactivated")
-    u.activation_notification_published.should_not be true
-
-    u.activate!
-
-    u.state.should eql("activated")
-    u.activation_notification_published.should be true
-  end
-
   it "should work normally with active_record dirty methods" do
     u = User.new(email: "doug@example.com")
 
@@ -110,6 +95,21 @@ describe Stator::Model do
     u.state.should eql("deactivated")
     u.activated_state_at.should be_nil
     u.should be_persisted
+  end
+
+  it "should conditionally invoke after_save callbacks when use_previous is true" do
+    u = User.new
+    u.email = "doug@example.com"
+
+    u.semiactivate!
+
+    u.state.should eql("semiactivated")
+    u.activation_notification_published.should_not be true
+
+    u.activate!
+
+    u.state.should eql("activated")
+    u.activation_notification_published.should be true
   end
 
   it "should blow up if the record is invalid and a bang method is used" do
